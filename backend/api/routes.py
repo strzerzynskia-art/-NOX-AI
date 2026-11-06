@@ -1,6 +1,10 @@
 from fastapi import APIRouter
+from api.schemas import CharacterSchema, MessageSchema
 
 router = APIRouter(prefix="/api", tags=["NØX AI"])
+
+# Stockage temporaire des personnages
+personnages = []
 
 
 @router.get("/")
@@ -13,14 +17,25 @@ def api_accueil():
 @router.get("/characters")
 def liste_personnages():
     return {
-        "characters": [],
-        "total": 0
+        "characters": personnages,
+        "total": len(personnages)
+    }
+
+
+@router.post("/characters")
+def creer_personnage(personnage: CharacterSchema):
+    personnages.append(personnage.model_dump())
+
+    return {
+        "message": "Personnage créé avec succès",
+        "character": personnage
     }
 
 
 @router.post("/chat")
-def envoyer_message(message: str):
+def envoyer_message(message: MessageSchema):
     return {
-        "user_message": message,
-        "response": "Le système de conversation NØX AI sera bientôt connecté."
-}
+        "speaker": message.speaker_name,
+        "user_message": message.content,
+        "response": "NØX AI a bien reçu ton message."
+             }
