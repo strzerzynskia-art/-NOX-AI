@@ -1,1 +1,1 @@
-"""Module API de NØX AI."""
+"""Package API de NØX AI."""
