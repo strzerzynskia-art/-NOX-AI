@@ -1,4 +1,3 @@
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -30,4 +29,3 @@ def statut():
         "serveur": "actif",
         "version": "0.1.0"
 }
-  
