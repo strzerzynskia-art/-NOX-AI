@@ -1,4 +1,3 @@
-
 from fastapi import APIRouter
 
 router = APIRouter(prefix="/api", tags=["NØX AI"])
@@ -25,4 +24,3 @@ def envoyer_message(message: str):
         "user_message": message,
         "response": "Le système de conversation NØX AI sera bientôt connecté."
 }
-  
