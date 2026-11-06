@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080b14">
+<title>NØX AI</title>
+
+<style>
+:root {
+  --bg: #080b14;
+  --panel: #101725;
+  --blue: #168cff;
+  --cyan: #00d9ff;
+  --text: #edf5ff;
+  --muted: #8291a8;
+  --border: #1c2b40;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, sans-serif;
+}
+
+button, input, textarea { font: inherit; }
+
+button {
+  cursor: pointer;
+  border: 0;
+}
+
+header {
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  background: #0b101c;
+  border-bottom: 1px solid var(--border);
+}
+
+.logo {
+  font-size: 23px;
+  font-weight: bold;
+  letter-spacing: 3px;
+}
+
+.logo span { color: var(--cyan); }
+
+.status {
+  color: #35e6a0;
+  font-size: 12px;
+}
+
+.layout {
+  display: flex;
+  min-height: calc(100vh - 68px);
+}
+
+nav {
+  width: 220px;
+  padding: 20px 12px;
+  background: #0b101c;
+  border-right: 1px solid var(--border);
+}
+
+.nav-title {
+  color: var(--muted);
+  font-size: 11px;
+  margin: 20px 10px 10px;
+}
+
+.nav-btn {
+  width: 100%;
+  padding: 13px;
+  margin-bottom: 7px;
+  color: #aab8cb;
+  text-align: left;
+  border-radius: 9px;
+  background: transparent;
+}
+
+.nav-btn:hover, .nav-btn.active {
+  background: #12233a;
+  color: var(--cyan);
+}
+
+main {
+  flex: 1;
+  min-width: 0;
+  padding: 28px;
+}
+
+.page { display: none; }
+.page.active { display: block; }
+
+h1 { margin-top: 0; font-size: 27px; }
+.subtitle { color: var(--muted); }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+  margin: 25px 0;
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  padding: 20px;
+}
+
+.card h3 { margin-top: 0; }
+.number { font-size: 28px; color: var(--cyan); }
+
+.primary {
+  background: linear-gradient(100deg, #0878e9, #00bfe9);
+  color: white;
+  border-radius: 8px;
+  padding: 12px 18px;
+  font-weight: bold;
+}
+
+.secondary {
+  background: #18263b;
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 10px 14px;
+  border-radius: 8px;
+}
+
+.character-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.character {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  padding: 18px;
+  border-radius: 12px;
+}
+
+.avatar {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: #123c65;
+  color: var(--cyan);
+  font-size: 23px;
+  margin-bottom: 12px;
+}
+
+.field {
+  width: 100%;
+  background: #0a1220;
+  border: 1px solid var(--border);
+  color: white;
+  padding: 13px;
+  border-radius: 8px;
+  margin: 7px 0 15px;
+}
+
+label {
+  color: #aab8cb;
+  font-size: 13px;
+}
+
+textarea.field {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.form-box {
+  max-width: 600px;
+}
+
+.chat-box {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  height: 55vh;
+  min-height: 280px;
+  overflow-y: auto;
+  padding: 15px;
+  margin: 15px 0;
+}
+
+.message {
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 10px;
+  max-width: 85%;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.user-message {
+  background: #123c65;
+  margin-left: auto;
+}
+
+.ai-message {
+  background: #1a2638;
+  margin-right: auto;
+}
+
+.chat-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.chat-controls input { flex: 1; min-width: 0; }
+
+.notice {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 15px;
+}
+
+#toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #15314d;
+  padding: 12px 18px;
+  border-radius: 9px;
+  display: none;
+  z-index: 10;
+}
+
+@media(max-width:650px) {
+  .layout { display: block; }
+  nav {
+    width: 100%;
+    display: flex;
+    overflow-x: auto;
+    padding: 8px;
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-title { display: none; }
+  .nav-btn {
+    width: auto;
+    white-space: nowrap;
+    margin: 0 4px;
+    padding: 12px;
+  }
+  main { padding: 20px 14px; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">NØX <span>AI</span></div>
+  <div class="status" id="connection">● Vérification...</div>
+</header>
+
+<div class="layout">
+
+<nav>
+  <button class="nav-btn active" data-page="dashboard">▦ Accueil</button>
+  <button class="nav-btn" data-page="characters">♙ Personnages</button>
+  <button class="nav-btn" data-page="create">＋ Créer</button>
+  <button class="nav-btn" data-page="chat">◈ Discussion</button>
+</nav>
+
+<main>
+
+<section class="page active" id="dashboard">
+  <h1>Bienvenue dans NØX AI</h1>
+  <p class="subtitle">Ton espace personnel d'intelligence artificielle.</p>
+
+  <div class="grid">
+    <div class="card">
+      <h3>Personnages</h3>
+      <div class="number" id="total">0</div>
+      <p class="subtitle">Personnages enregistrés</p>
+    </div>
+
+    <div class="card">
+      <h3>Serveur</h3>
+      <div class="number" id="server">...</div>
+      <p class="subtitle">État de connexion</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Bienvenue dans ton univers</h3>
+    <p class="subtitle">
+      Crée tes personnages et commence tes conversations.
+    </p>
+    <button class="primary" onclick="showPage('create')">
+      + Créer un personnage
+    </button>
+  </div>
+</section>
+
+<section class="page" id="characters">
+  <h1>Mes personnages</h1>
+  <p class="subtitle">Retrouve tous tes personnages.</p>
+  <button class="primary" onclick="showPage('create')">
+    + Nouveau personnage
+  </button>
+  <div class="character-list" id="characterList"></div>
+</section>
+
+<section class="page" id="create">
+  <h1>Créer un personnage</h1>
+  <p class="subtitle">Imagine et personnalise ton personnage.</p>
+
+  <div class="card form-box">
+    <label>Nom</label>
+    <input class="field" id="name" placeholder="Nom du personnage">
+
+    <label>Âge</label>
+    <input class="field" id="age" placeholder="Âge">
+
+    <label>Apparence</label>
+    <textarea class="field" id="appearance" placeholder="Décris son apparence..."></textarea>
+
+    <label>Personnalité</label>
+    <textarea class="field" id="personality" placeholder="Décris sa personnalité..."></textarea>
+
+    <label>Histoire</label>
+    <textarea class="field" id="backstory" placeholder="Son histoire..."></textarea>
+
+    <label>Scénario</label>
+    <textarea class="field" id="scenario" placeholder="Le contexte de départ..."></textarea>
+
+    <label>Premier message</label>
+    <textarea class="field" id="first_message" placeholder="Son premier message..."></textarea>
+
+    <button class="primary" onclick="createCharacter()">
+      Enregistrer le personnage
+    </button>
+  </div>
+</section>
+
+<section class="page" id="chat">
+  <h1>Discussion</h1>
+  <p class="subtitle">Discute avec tes personnages.</p>
+
+  <label>Choisir un personnage</label>
+  <select class="field" id="speaker"></select>
+
+  <div class="chat-box" id="messages">
+    <p class="subtitle">Sélectionne un personnage pour commencer.</p>
+  </div>
+
+  <div class="chat-controls">
+    <input class="field" id="chatInput" placeholder="Écris ton message...">
+    <button class="primary" onclick="sendMessage()">Envoyer</button>
+  </div>
+
+  <p class="notice">
+    Le chat utilise actuellement une réponse de test du backend.
+    Le véritable modèle IA sera ajouté plus tard.
+  </p>
+</section>
+
+</main>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const API = "https://nox-ai-sz1x.onrender.com";
+
+let characters = [];
+
+function toast(message) {
+  const box = document.getElementById("toast");
+  box.textContent = message;
+  box.style.display = "block";
+  setTimeout(() => box.style.display = "none", 3000);
+}
+
+function showPage(page) {
+  document.querySelectorAll(".page").forEach(p => {
+    p.classList.remove("active");
+  });
+
+  document.getElementById(page).classList.add("active");
+
+  document.querySelectorAll(".nav-btn").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.page === page);
+  });
+}
+
+document.querySelectorAll(".nav-btn").forEach(btn => {
+  btn.addEventListener("click", () => showPage(btn.dataset.page));
+});
+
+async function checkServer() {
+  const status = document.getElementById("connection");
+  const server = document.getElementById("server");
+
+  try {
+    const response = await fetch(API + "/status");
+    if (!response.ok) throw new Error("Serveur indisponible");
+
+    status.textContent = "● En ligne";
+    status.style.color = "#35e6a0";
+    server.textContent = "ACTIF";
+  } catch (error) {
+    status.textContent = "● Hors ligne";
+    status.style.color = "#ff6464";
+    server.textContent = "OFF";
+  }
+}
+
+async function loadCharacters() {
+  try {
+    const response = await fetch(API + "/api/characters");
+    if (!response.ok) throw new Error("Erreur API");
+
+    const data = await response.json();
+    characters = data.characters || [];
+
+    document.getElementById("total").textContent = data.total;
+
+    const list = document.getElementById("characterList");
+    const select = document.getElementById("speaker");
+
+    list.innerHTML = "";
+    select.innerHTML = "";
+
+    if (characters.length === 0) {
+      list.textContent = "Aucun personnage enregistré.";
+      select.innerHTML = '<option value="">Aucun personnage</option>';
+      return;
+    }
+
+    characters.forEach(character => {
+      const card = document.createElement("div");
+      card.className = "character";
+
+      const avatar = document.createElement("div");
+      avatar.className = "avatar";
+      avatar.textContent = character.name.charAt(0).toUpperCase();
+
+      const title = document.createElement("h3");
+      title.textContent = character.name;
+
+      const personality = document.createElement("p");
+      personality.className = "subtitle";
+      personality.textContent = character.personality || "Personnage NØX AI";
+
+      const button = document.createElement("button");
+      button.className = "secondary";
+      button.textContent = "Discuter";
+      button.onclick = () => {
+        select.value = character.name;
+        showPage("chat");
+      };
+
+      card.append(avatar, title, personality, button);
+      list.appendChild(card);
+
+      const option = document.createElement("option");
+      option.value = character.name;
+      option.textContent = character.name;
+      select.appendChild(option);
+    });
+
+  } catch (error) {
+    toast("Impossible de charger les personnages.");
+  }
+}
+
+async function createCharacter() {
+  const character = {
+    name: document.getElementById("name").value.trim(),
+    age: document.getElementById("age").value.trim(),
+    appearance: document.getElementById("appearance").value.trim(),
+    personality: document.getElementById("personality").value.trim(),
+    backstory: document.getElementById("backstory").value.trim(),
+    scenario: document.getElementById("scenario").value.trim(),
+    first_message: document.getElementById("first_message").value.trim()
+  };
+
+  if (!character.name) {
+    toast("Le nom du personnage est obligatoire.");
+    return;
+  }
+
+  try {
+    const response = await fetch(API + "/api/characters", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(character)
+    });
+
+    if (!response.ok) throw new Error("Enregistrement impossible");
+
+    toast("Personnage enregistré !");
+    document.querySelectorAll("#create input, #create textarea")
+      .forEach(input => input.value = "");
+
+    await loadCharacters();
+    showPage("characters");
+
+  } catch (error) {
+    toast("Erreur lors de la création du personnage.");
+  }
+}
+
+function addMessage(text, type) {
+  const box = document.getElementById("messages");
+  const message = document.createElement("div");
+  message.className = "message " + type;
+  message.textContent = text;
+  box.appendChild(message);
+  box.scrollTop = box.scrollHeight;
+}
+
+async function sendMessage() {
+  const input = document.getElementById("chatInput");
+  const speaker = document.getElementById("speaker").value;
+  const content = input.value.trim();
+
+  if (!speaker) {
+    toast("Choisis d'abord un personnage.");
+    return;
+  }
+
+  if (!content) return;
+
+  input.value = "";
+  addMessage(content, "user-message");
+
+  try {
+    const response = await fetch(API + "/api/chat", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        speaker_name: speaker,
+        content: content,
+        message_type: "dialogue"
+      })
+    });
+
+    if (!response.ok) throw new Error("Erreur chat");
+
+    const data = await response.json();
+    addMessage(data.response, "ai-message");
+
+  } catch (error) {
+    addMessage("Impossible de contacter NØX AI.", "ai-message");
+  }
+}
+
+document.getElementById("chatInput").addEventListener("keydown", event => {
+  if (event.key === "Enter") sendMessage();
+});
+
+checkServer();
+loadCharacters();
+</script>
+
+</body>
+  </html>
