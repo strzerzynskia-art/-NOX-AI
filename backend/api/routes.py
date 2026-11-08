@@ -174,7 +174,9 @@ async def envoyer_message(message: MessageSchema):
     if not character:
         raise HTTPException(status_code=404, detail="Personnage introuvable")
     character_id = character["id"]
-    sauvegarder_message(character_id, "user", message.content)
+    if not message.content.strip() and not message.image:
+        raise HTTPException(status_code=400, detail="Ajoute un texte ou une image.")
+    sauvegarder_message(character_id, "user", message.content or "Image envoyée", message.image)
     history = recuperer_messages(character_id, 60)
     memories = recuperer_memoires(character_id, 30) if character.get("enhanced_memory") else []
     answer = await generer_reponse(character, history[:-1], message.content, memories)
