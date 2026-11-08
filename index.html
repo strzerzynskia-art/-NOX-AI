@@ -2,574 +2,85 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#080b14">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#090b14">
 <title>NØX AI</title>
-
 <style>
-:root {
-  --bg: #080b14;
-  --panel: #101725;
-  --blue: #168cff;
-  --cyan: #00d9ff;
-  --text: #edf5ff;
-  --muted: #8291a8;
-  --border: #1c2b40;
-}
-
-* { box-sizing: border-box; }
-
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--text);
-  font-family: Arial, sans-serif;
-}
-
-button, input, textarea { font: inherit; }
-
-button {
-  cursor: pointer;
-  border: 0;
-}
-
-header {
-  height: 68px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 20px;
-  background: #0b101c;
-  border-bottom: 1px solid var(--border);
-}
-
-.logo {
-  font-size: 23px;
-  font-weight: bold;
-  letter-spacing: 3px;
-}
-
-.logo span { color: var(--cyan); }
-
-.status {
-  color: #35e6a0;
-  font-size: 12px;
-}
-
-.layout {
-  display: flex;
-  min-height: calc(100vh - 68px);
-}
-
-nav {
-  width: 220px;
-  padding: 20px 12px;
-  background: #0b101c;
-  border-right: 1px solid var(--border);
-}
-
-.nav-title {
-  color: var(--muted);
-  font-size: 11px;
-  margin: 20px 10px 10px;
-}
-
-.nav-btn {
-  width: 100%;
-  padding: 13px;
-  margin-bottom: 7px;
-  color: #aab8cb;
-  text-align: left;
-  border-radius: 9px;
-  background: transparent;
-}
-
-.nav-btn:hover, .nav-btn.active {
-  background: #12233a;
-  color: var(--cyan);
-}
-
-main {
-  flex: 1;
-  min-width: 0;
-  padding: 28px;
-}
-
-.page { display: none; }
-.page.active { display: block; }
-
-h1 { margin-top: 0; font-size: 27px; }
-.subtitle { color: var(--muted); }
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 15px;
-  margin: 25px 0;
-}
-
-.card {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 13px;
-  padding: 20px;
-}
-
-.card h3 { margin-top: 0; }
-.number { font-size: 28px; color: var(--cyan); }
-
-.primary {
-  background: linear-gradient(100deg, #0878e9, #00bfe9);
-  color: white;
-  border-radius: 8px;
-  padding: 12px 18px;
-  font-weight: bold;
-}
-
-.secondary {
-  background: #18263b;
-  color: var(--text);
-  border: 1px solid var(--border);
-  padding: 10px 14px;
-  border-radius: 8px;
-}
-
-.character-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-  gap: 15px;
-  margin-top: 20px;
-}
-
-.character {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  padding: 18px;
-  border-radius: 12px;
-}
-
-.avatar {
-  width: 48px;
-  height: 48px;
-  display: grid;
-  place-items: center;
-  border-radius: 12px;
-  background: #123c65;
-  color: var(--cyan);
-  font-size: 23px;
-  margin-bottom: 12px;
-}
-
-.field {
-  width: 100%;
-  background: #0a1220;
-  border: 1px solid var(--border);
-  color: white;
-  padding: 13px;
-  border-radius: 8px;
-  margin: 7px 0 15px;
-}
-
-label {
-  color: #aab8cb;
-  font-size: 13px;
-}
-
-textarea.field {
-  min-height: 90px;
-  resize: vertical;
-}
-
-.form-box {
-  max-width: 600px;
-}
-
-.chat-box {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  height: 55vh;
-  min-height: 280px;
-  overflow-y: auto;
-  padding: 15px;
-  margin: 15px 0;
-}
-
-.message {
-  padding: 12px;
-  margin: 10px 0;
-  border-radius: 10px;
-  max-width: 85%;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
-
-.user-message {
-  background: #123c65;
-  margin-left: auto;
-}
-
-.ai-message {
-  background: #1a2638;
-  margin-right: auto;
-}
-
-.chat-controls {
-  display: flex;
-  gap: 8px;
-}
-
-.chat-controls input { flex: 1; min-width: 0; }
-
-.notice {
-  color: var(--muted);
-  font-size: 12px;
-  margin-top: 15px;
-}
-
-#toast {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #15314d;
-  padding: 12px 18px;
-  border-radius: 9px;
-  display: none;
-  z-index: 10;
-}
-
-@media(max-width:650px) {
-  .layout { display: block; }
-  nav {
-    width: 100%;
-    display: flex;
-    overflow-x: auto;
-    padding: 8px;
-    border-right: 0;
-    border-bottom: 1px solid var(--border);
-  }
-  .nav-title { display: none; }
-  .nav-btn {
-    width: auto;
-    white-space: nowrap;
-    margin: 0 4px;
-    padding: 12px;
-  }
-  main { padding: 20px 14px; }
-}
+:root{--bg:#090b14;--panel:#111827;--panel2:#0d1421;--line:#263449;--text:#eef4ff;--muted:#91a0b7;--cyan:#55dfff;--purple:#a78bfa;--green:#4adea4}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top right,#17213c 0,transparent 42%),var(--bg);color:var(--text);font:15px Arial,sans-serif}button,input,textarea,select{font:inherit}button{cursor:pointer}.top{height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid var(--line);background:#0b101bdc;position:sticky;top:0;z-index:5;backdrop-filter:blur(12px)}.brand{font-weight:900;letter-spacing:3px;font-size:22px}.brand span{color:var(--cyan)}#status{font-size:12px;color:var(--muted)}.shell{display:flex;min-height:calc(100vh - 64px)}nav{width:210px;padding:18px 12px;border-right:1px solid var(--line);background:#0b101b}.navbtn{width:100%;padding:13px;text-align:left;background:transparent;color:var(--muted);border-radius:10px;border:0;margin:3px 0}.navbtn.active,.navbtn:hover{background:#17253a;color:var(--cyan)}main{padding:26px;width:min(100%,1100px);margin:auto}.page{display:none}.page.active{display:block}h1{font-size:26px;margin:0 0 8px}h2{font-size:18px;margin:0 0 14px}.sub{color:var(--muted);line-height:1.5}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:22px 0}.card{background:linear-gradient(145deg,var(--panel),#0e1522);border:1px solid var(--line);border-radius:15px;padding:18px;margin:14px 0}.metric{font-size:30px;color:var(--cyan);font-weight:bold;margin-top:10px}.btn{border:0;border-radius:9px;padding:12px 16px;background:linear-gradient(100deg,#0879df,#08b9d5);color:white;font-weight:bold}.btn.secondary{background:#1b2940;border:1px solid var(--line);color:var(--text)}.btn:disabled{opacity:.5}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:flex;flex-direction:column;gap:7px;margin-bottom:13px}.field label{font-size:13px;color:#b8c6d9}.field input,.field textarea,.field select{width:100%;padding:12px;border:1px solid var(--line);border-radius:9px;background:var(--panel2);color:var(--text);outline:none}.field textarea{min-height:90px;resize:vertical}.field input:focus,.field textarea:focus{border-color:var(--cyan)}.checkrow{display:flex;gap:18px;flex-wrap:wrap;color:var(--muted);font-size:13px;margin:10px 0 18px}.checkrow label{display:flex;align-items:center;gap:7px}.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:13px;margin-top:18px}.character{border:1px solid var(--line);background:var(--panel);border-radius:13px;padding:16px}.avatar{width:46px;height:46px;display:grid;place-items:center;border-radius:13px;background:#183b58;color:var(--cyan);font-size:20px;margin-bottom:12px}.chathead{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.chatbox{height:52vh;min-height:280px;overflow:auto;background:#0a111d;border:1px solid var(--line);border-radius:13px;padding:13px;margin:14px 0}.bubble{max-width:88%;white-space:pre-wrap;overflow-wrap:anywhere;padding:12px 14px;border-radius:12px;margin:9px 0;line-height:1.5}.bubble.user{margin-left:auto;background:#15385b}.bubble.ai{background:#202a3b}.sendrow{display:flex;gap:8px}.sendrow input{flex:1;min-width:0;background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:12px;color:white}.hint{font-size:12px;color:var(--muted);line-height:1.5}.empty{color:var(--muted);padding:18px;text-align:center}.hidden{display:none!important}
+@media(max-width:650px){.shell{display:block}nav{width:100%;display:flex;overflow-x:auto;padding:7px;border-right:0;border-bottom:1px solid var(--line);position:sticky;top:64px;z-index:4}.navbtn{width:auto;white-space:nowrap;margin:0 3px;padding:11px}.navbtn span{display:none}main{padding:19px 13px}.formgrid{grid-template-columns:1fr}.card{padding:15px}.chatbox{height:48vh}.bubble{max-width:94%}.top{padding:0 13px}}
 </style>
 </head>
-
 <body>
-
-<header>
-  <div class="logo">NØX <span>AI</span></div>
-  <div class="status" id="connection">● Vérification...</div>
-</header>
-
-<div class="layout">
-
+<header class="top"><div class="brand">NØX <span>AI</span></div><div id="status">● Connexion…</div></header>
+<div class="shell">
 <nav>
-  <button class="nav-btn active" data-page="dashboard">▦ Accueil</button>
-  <button class="nav-btn" data-page="characters">♙ Personnages</button>
-  <button class="nav-btn" data-page="create">＋ Créer</button>
-  <button class="nav-btn" data-page="chat">◈ Discussion</button>
+<button class="navbtn active" data-page="home">▦ Accueil</button>
+<button class="navbtn" data-page="characters">♙ Personnages</button>
+<button class="navbtn" data-page="create">＋ Créer</button>
+<button class="navbtn" data-page="chat">◈ Discussion</button>
 </nav>
-
 <main>
-
-<section class="page active" id="dashboard">
-  <h1>Bienvenue dans NØX AI</h1>
-  <p class="subtitle">Ton espace personnel d'intelligence artificielle.</p>
-
-  <div class="grid">
-    <div class="card">
-      <h3>Personnages</h3>
-      <div class="number" id="total">0</div>
-      <p class="subtitle">Personnages enregistrés</p>
-    </div>
-
-    <div class="card">
-      <h3>Serveur</h3>
-      <div class="number" id="server">...</div>
-      <p class="subtitle">État de connexion</p>
-    </div>
-  </div>
-
-  <div class="card">
-    <h3>Bienvenue dans ton univers</h3>
-    <p class="subtitle">
-      Crée tes personnages et commence tes conversations.
-    </p>
-    <button class="primary" onclick="showPage('create')">
-      + Créer un personnage
-    </button>
-  </div>
+<section class="page active" id="home">
+<h1>Bienvenue dans NØX AI</h1><p class="sub">Ton univers de roleplay personnel.</p>
+<div class="grid"><div class="card"><div class="sub">Personnages créés</div><div class="metric" id="total">0</div></div><div class="card"><div class="sub">Serveur</div><div class="metric" id="server">…</div></div><div class="card"><div class="sub">Intelligence artificielle</div><div class="metric" id="aiState" style="font-size:18px">Vérification</div></div></div>
+<div class="card"><h2>Ton espace NØX</h2><p class="sub">Crée des personnages détaillés, définis leurs secrets et leurs relations, puis retrouve leurs conversations.</p><button class="btn" onclick="showPage('create')">Créer un personnage</button></div>
 </section>
-
 <section class="page" id="characters">
-  <h1>Mes personnages</h1>
-  <p class="subtitle">Retrouve tous tes personnages.</p>
-  <button class="primary" onclick="showPage('create')">
-    + Nouveau personnage
-  </button>
-  <div class="character-list" id="characterList"></div>
+<h1>Mes personnages</h1><p class="sub">Tous tes personnages enregistrés.</p><button class="btn" onclick="showPage('create')">＋ Nouveau personnage</button><div class="cards" id="characterList"><div class="empty">Chargement…</div></div>
 </section>
-
 <section class="page" id="create">
-  <h1>Créer un personnage</h1>
-  <p class="subtitle">Imagine et personnalise ton personnage.</p>
-
-  <div class="card form-box">
-    <label>Nom</label>
-    <input class="field" id="name" placeholder="Nom du personnage">
-
-    <label>Âge</label>
-    <input class="field" id="age" placeholder="Âge">
-
-    <label>Apparence</label>
-    <textarea class="field" id="appearance" placeholder="Décris son apparence..."></textarea>
-
-    <label>Personnalité</label>
-    <textarea class="field" id="personality" placeholder="Décris sa personnalité..."></textarea>
-
-    <label>Histoire</label>
-    <textarea class="field" id="backstory" placeholder="Son histoire..."></textarea>
-
-    <label>Scénario</label>
-    <textarea class="field" id="scenario" placeholder="Le contexte de départ..."></textarea>
-
-    <label>Premier message</label>
-    <textarea class="field" id="first_message" placeholder="Son premier message..."></textarea>
-
-    <button class="primary" onclick="createCharacter()">
-      Enregistrer le personnage
-    </button>
-  </div>
-</section>
-
-<section class="page" id="chat">
-  <h1>Discussion</h1>
-  <p class="subtitle">Discute avec tes personnages.</p>
-
-  <label>Choisir un personnage</label>
-  <select class="field" id="speaker"></select>
-
-  <div class="chat-box" id="messages">
-    <p class="subtitle">Sélectionne un personnage pour commencer.</p>
-  </div>
-
-  <div class="chat-controls">
-    <input class="field" id="chatInput" placeholder="Écris ton message...">
-    <button class="primary" onclick="sendMessage()">Envoyer</button>
-  </div>
-
-  <p class="notice">
-    Le chat utilise actuellement une réponse de test du backend.
-    Le véritable modèle IA sera ajouté plus tard.
-  </p>
-</section>
-
-</main>
+<h1>Créer un personnage</h1><p class="sub">Construis son identité et son univers.</p>
+<form id="characterForm" class="card">
+<div class="formgrid">
+<div class="field"><label for="name">Nom *</label><input id="name" maxlength="80" required placeholder="Nom du personnage"></div>
+<div class="field"><label for="age">Âge</label><input id="age" placeholder="Âge"></div>
+<div class="field"><label for="avatar">Avatar (URL d'image facultative)</label><input id="avatar" placeholder="https://…"></div>
+<div class="field"><label for="theme">Thème</label><select id="theme"><option value="cyber">Cyber</option><option value="dark">Sombre</option><option value="purple">Violet</option></select></div>
 </div>
-
-<div id="toast"></div>
-
+<div class="field"><label for="appearance">Apparence</label><textarea id="appearance" placeholder="Cheveux, yeux, vêtements, signes distinctifs…"></textarea></div>
+<div class="field"><label for="personality">Personnalité</label><textarea id="personality" placeholder="Caractère, qualités, défauts, comportement…"></textarea></div>
+<div class="field"><label for="personality_tags">Traits de personnalité (séparés par des virgules)</label><input id="personality_tags" placeholder="Protecteur, drôle, réservé…"></div>
+<div class="field"><label for="backstory">Histoire / passé</label><textarea id="backstory" placeholder="Son histoire, son vécu…"></textarea></div>
+<div class="field"><label for="secrets">Secrets</label><textarea id="secrets" placeholder="Ce qu'il cache et ne révèle pas immédiatement…"></textarea></div>
+<div class="field"><label for="relationships">Relations avec les autres personnages</label><textarea id="relationships" placeholder="Amitié, rivalité, famille, sentiments, histoire commune…"></textarea></div>
+<div class="field"><label for="scenario">Scénario de départ</label><textarea id="scenario" placeholder="Lieu, situation, contexte…"></textarea></div>
+<div class="field"><label for="first_message">Premier message</label><textarea id="first_message" placeholder="Le début de la scène…"></textarea></div>
+<div class="checkrow">
+<label><input type="checkbox" id="complex_relationships" checked> Relations complexes</label>
+<label><input type="checkbox" id="evolving_personality" checked> Personnalité évolutive</label>
+<label><input type="checkbox" id="enhanced_memory" checked> Mémoire renforcée</label>
+</div>
+<button class="btn" type="submit">Enregistrer le personnage</button>
+</form>
+</section>
+<section class="page" id="chat">
+<h1>Discussion</h1><p class="sub">Tes conversations sont enregistrées sur le serveur.</p>
+<div class="chathead"><div class="field" style="flex:1;min-width:190px;margin:0"><label for="speaker">Personnage</label><select id="speaker"><option value="">Choisir un personnage</option></select></div><button class="btn secondary" id="reloadChat">Recharger</button></div>
+<div class="chatbox" id="messages"><div class="empty">Choisis un personnage pour afficher la conversation.</div></div>
+<div class="sendrow"><input id="chatInput" maxlength="8000" placeholder="Écris ton message…"><button class="btn" id="sendBtn">Envoyer</button></div>
+<p class="hint" id="chatHint">Le chat conserve l'historique. Pour activer les réponses générées par IA, configure une clé API côté serveur Render. Ne partage jamais cette clé dans cette page.</p>
+</section>
+</main></div>
 <script>
-const API = "https://nox-ai-sz1x.onrender.com";
-
-let characters = [];
-
-function toast(message) {
-  const box = document.getElementById("toast");
-  box.textContent = message;
-  box.style.display = "block";
-  setTimeout(() => box.style.display = "none", 3000);
-}
-
-function showPage(page) {
-  document.querySelectorAll(".page").forEach(p => {
-    p.classList.remove("active");
-  });
-
-  document.getElementById(page).classList.add("active");
-
-  document.querySelectorAll(".nav-btn").forEach(btn => {
-    btn.classList.toggle("active", btn.dataset.page === page);
-  });
-}
-
-document.querySelectorAll(".nav-btn").forEach(btn => {
-  btn.addEventListener("click", () => showPage(btn.dataset.page));
-});
-
-async function checkServer() {
-  const status = document.getElementById("connection");
-  const server = document.getElementById("server");
-
-  try {
-    const response = await fetch(API + "/status");
-    if (!response.ok) throw new Error("Serveur indisponible");
-
-    status.textContent = "● En ligne";
-    status.style.color = "#35e6a0";
-    server.textContent = "ACTIF";
-  } catch (error) {
-    status.textContent = "● Hors ligne";
-    status.style.color = "#ff6464";
-    server.textContent = "OFF";
-  }
-}
-
-async function loadCharacters() {
-  try {
-    const response = await fetch(API + "/api/characters");
-    if (!response.ok) throw new Error("Erreur API");
-
-    const data = await response.json();
-    characters = data.characters || [];
-
-    document.getElementById("total").textContent = data.total;
-
-    const list = document.getElementById("characterList");
-    const select = document.getElementById("speaker");
-
-    list.innerHTML = "";
-    select.innerHTML = "";
-
-    if (characters.length === 0) {
-      list.textContent = "Aucun personnage enregistré.";
-      select.innerHTML = '<option value="">Aucun personnage</option>';
-      return;
-    }
-
-    characters.forEach(character => {
-      const card = document.createElement("div");
-      card.className = "character";
-
-      const avatar = document.createElement("div");
-      avatar.className = "avatar";
-      avatar.textContent = character.name.charAt(0).toUpperCase();
-
-      const title = document.createElement("h3");
-      title.textContent = character.name;
-
-      const personality = document.createElement("p");
-      personality.className = "subtitle";
-      personality.textContent = character.personality || "Personnage NØX AI";
-
-      const button = document.createElement("button");
-      button.className = "secondary";
-      button.textContent = "Discuter";
-      button.onclick = () => {
-        select.value = character.name;
-        showPage("chat");
-      };
-
-      card.append(avatar, title, personality, button);
-      list.appendChild(card);
-
-      const option = document.createElement("option");
-      option.value = character.name;
-      option.textContent = character.name;
-      select.appendChild(option);
-    });
-
-  } catch (error) {
-    toast("Impossible de charger les personnages.");
-  }
-}
-
-async function createCharacter() {
-  const character = {
-    name: document.getElementById("name").value.trim(),
-    age: document.getElementById("age").value.trim(),
-    appearance: document.getElementById("appearance").value.trim(),
-    personality: document.getElementById("personality").value.trim(),
-    backstory: document.getElementById("backstory").value.trim(),
-    scenario: document.getElementById("scenario").value.trim(),
-    first_message: document.getElementById("first_message").value.trim()
-  };
-
-  if (!character.name) {
-    toast("Le nom du personnage est obligatoire.");
-    return;
-  }
-
-  try {
-    const response = await fetch(API + "/api/characters", {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify(character)
-    });
-
-    if (!response.ok) throw new Error("Enregistrement impossible");
-
-    toast("Personnage enregistré !");
-    document.querySelectorAll("#create input, #create textarea")
-      .forEach(input => input.value = "");
-
-    await loadCharacters();
-    showPage("characters");
-
-  } catch (error) {
-    toast("Erreur lors de la création du personnage.");
-  }
-}
-
-function addMessage(text, type) {
-  const box = document.getElementById("messages");
-  const message = document.createElement("div");
-  message.className = "message " + type;
-  message.textContent = text;
-  box.appendChild(message);
-  box.scrollTop = box.scrollHeight;
-}
-
-async function sendMessage() {
-  const input = document.getElementById("chatInput");
-  const speaker = document.getElementById("speaker").value;
-  const content = input.value.trim();
-
-  if (!speaker) {
-    toast("Choisis d'abord un personnage.");
-    return;
-  }
-
-  if (!content) return;
-
-  input.value = "";
-  addMessage(content, "user-message");
-
-  try {
-    const response = await fetch(API + "/api/chat", {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({
-        speaker_name: speaker,
-        content: content,
-        message_type: "dialogue"
-      })
-    });
-
-    if (!response.ok) throw new Error("Erreur chat");
-
-    const data = await response.json();
-    addMessage(data.response, "ai-message");
-
-  } catch (error) {
-    addMessage("Impossible de contacter NØX AI.", "ai-message");
-  }
-}
-
-document.getElementById("chatInput").addEventListener("keydown", event => {
-  if (event.key === "Enter") sendMessage();
-});
-
-checkServer();
-loadCharacters();
+const API="https://nox-ai-sz1x.onrender.com";
+let characters=[];
+let activeCharacterId=null;
+const $=id=>document.getElementById(id);
+function toast(message){const n=document.createElement("div");n.textContent=message;n.style="position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#193451;border:1px solid #35506d;padding:12px 16px;border-radius:10px;z-index:20;max-width:90%;text-align:center";document.body.appendChild(n);setTimeout(()=>n.remove(),3200)}
+function showPage(id){document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===id));document.querySelectorAll(".navbtn").forEach(b=>b.classList.toggle("active",b.dataset.page===id));}
+document.querySelectorAll(".navbtn").forEach(b=>b.addEventListener("click",()=>showPage(b.dataset.page)));
+async function request(path,options={}){const r=await fetch(API+path,options);if(!r.ok){let message="Erreur serveur";try{const d=await r.json();message=d.detail||message}catch{}throw new Error(message)}return r.json()}
+async function checkServer(){try{await request("/status");$("status").textContent="● Serveur en ligne";$("status").style.color="var(--green)";$("server").textContent="ACTIF";const h=await request("/api/health");$("aiState").textContent=h.ai_configured?"IA configurée":"Clé IA manquante";$("aiState").style.color=h.ai_configured?"var(--green)":"var(--purple)"}catch{$("status").textContent="● Hors ligne";$("status").style.color="#fb7185";$("server").textContent="OFF";$("aiState").textContent="Indisponible"}}
+async function loadCharacters(){try{const d=await request("/api/characters");characters=d.characters||[];$("total").textContent=d.total??characters.length;const list=$("characterList"),select=$("speaker");list.replaceChildren();select.innerHTML='<option value="">Choisir un personnage</option>';if(!characters.length){list.innerHTML='<div class="empty">Aucun personnage pour le moment.</div>';return}characters.forEach(c=>{const card=document.createElement("article");card.className="character";const avatar=document.createElement("div");avatar.className="avatar";if(c.avatar){const img=document.createElement("img");img.src=c.avatar;img.alt="";img.style="width:100%;height:100%;object-fit:cover;border-radius:13px";img.onerror=()=>{avatar.textContent=(c.name||"?").charAt(0).toUpperCase()};avatar.append(img)}else avatar.textContent=(c.name||"?").charAt(0).toUpperCase();const title=document.createElement("h2");title.textContent=c.name;const desc=document.createElement("p");desc.className="sub";desc.textContent=c.personality||"Personnage NØX AI";const btn=document.createElement("button");btn.className="btn secondary";btn.textContent="Ouvrir la discussion";btn.onclick=()=>openChat(c.id);card.append(avatar,title,desc,btn);list.append(card);const opt=document.createElement("option");opt.value=c.id;opt.textContent=c.name;select.append(opt)})}catch(e){toast("Chargement impossible : "+e.message)}}
+$("characterForm").addEventListener("submit",async e=>{e.preventDefault();const data={name:$("name").value.trim(),age:$("age").value.trim(),avatar:$("avatar").value.trim(),theme:$("theme").value,appearance:$("appearance").value.trim(),personality:$("personality").value.trim(),personality_tags:$("personality_tags").value.split(",").map(x=>x.trim()).filter(Boolean),backstory:$("backstory").value.trim(),secrets:$("secrets").value.trim(),relationships:$("relationships").value.trim(),scenario:$("scenario").value.trim(),first_message:$("first_message").value.trim(),complex_relationships:$("complex_relationships").checked,evolving_personality:$("evolving_personality").checked,enhanced_memory:$("enhanced_memory").checked};try{const d=await request("/api/characters",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});toast("Personnage enregistré !");$("characterForm").reset();$("complex_relationships").checked=$("evolving_personality").checked=$("enhanced_memory").checked=true;await loadCharacters();showPage("characters")}catch(err){toast("Erreur : "+err.message)}});
+async function openChat(id){activeCharacterId=id;$("speaker").value=String(id);showPage("chat");await loadMessages()}
+async function loadMessages(){if(!activeCharacterId){$("messages").innerHTML='<div class="empty">Choisis un personnage.</div>';return}try{const d=await request("/api/characters/"+activeCharacterId+"/messages");const box=$("messages");box.replaceChildren();if(!d.messages.length){const c=characters.find(x=>x.id===activeCharacterId);const intro=c?.first_message;if(intro)addBubble(intro,"ai");else box.innerHTML='<div class="empty">Commence la conversation.</div>';return}d.messages.forEach(m=>addBubble(m.content,m.role==="user"?"user":"ai"));box.scrollTop=box.scrollHeight}catch(e){toast(e.message)}}
+function addBubble(text,role){const b=document.createElement("div");b.className="bubble "+role;b.textContent=text;$("messages").append(b)}
+$("speaker").addEventListener("change",async()=>{activeCharacterId=Number($("speaker").value)||null;await loadMessages()});
+$("reloadChat").addEventListener("click",loadMessages);
+async function sendMessage(){const text=$("chatInput").value.trim();if(!activeCharacterId){toast("Choisis un personnage.");return}if(!text)return;$("chatInput").value="";addBubble(text,"user");$("sendBtn").disabled=true;try{const c=characters.find(x=>x.id===activeCharacterId);const d=await request("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({speaker_name:c.name,content:text,message_type:"dialogue"})});addBubble(d.response,"ai");$("messages").scrollTop=$("messages").scrollHeight}catch(e){toast(e.message);addBubble("Le message n'a pas pu être traité.","ai")}finally{$("sendBtn").disabled=false}}
+$("sendBtn").addEventListener("click",sendMessage);$("chatInput").addEventListener("keydown",e=>{if(e.key==="Enter")sendMessage()});
+checkServer();loadCharacters();
 </script>
-
-</body>
-  </html>
+</body></html>
