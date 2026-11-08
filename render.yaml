@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: -NOX-AI
+    runtime: python
+    plan: free
+    region: ohio
+    branch: main
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    autoDeploy: true
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: nox-ai-database
+          property: connectionString
+
+databases:
+  - name: nox-ai-database
+    databaseName: nox_ai_database
+    user: nox_ai_database_user
+    postgresMajorVersion: "18"
+    region: ohio
+    plan: free
+    ipAllowList: []
