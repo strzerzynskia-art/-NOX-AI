@@ -107,10 +107,15 @@ Réponds en français, de façon naturelle et cohérente avec le personnage."""
 
 @router.post("/chat")
 async def envoyer_message(message: MessageSchema):
-    matches = [c for c in recuperer_personnages() if c["name"].casefold() == message.speaker_name.casefold()]
-    if not matches:
+    if message.character_id is not None:
+        character = recuperer_personnage(message.character_id)
+    elif message.speaker_name:
+        matches = [c for c in recuperer_personnages() if c["name"].casefold() == message.speaker_name.casefold()]
+        character = matches[0] if matches else None
+    else:
+        character = None
+    if not character:
         raise HTTPException(status_code=404, detail="Personnage introuvable")
-    character = matches[0]
     character_id = character["id"]
     sauvegarder_message(character_id, "user", message.content)
     history = recuperer_messages(character_id, 60)
