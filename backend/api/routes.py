@@ -88,8 +88,8 @@ retourne []."""
     try:
         async with httpx.AsyncClient(timeout=30) as client:
             response = await client.post(
-                "https://api.openai.com/v1/chat/completions",
-                headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+                f"{base_url}/chat/completions",
+                headers={"Authorization": f"Bearer {api_key or 'ollama'}", "Content-Type": "application/json"},
                 json={"model": model, "messages": [
                     {"role": "system", "content": prompt},
                     {"role": "user", "content": conversation}
@@ -121,8 +121,9 @@ retourne []."""
 
 
 async def generer_reponse(character, history, user_text, memories):
-    api_key = os.getenv("OPENAI_API_KEY")
-    model = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+    api_key = os.getenv("AI_API_KEY") or os.getenv("OPENAI_API_KEY", "")
+    base_url = os.getenv("AI_BASE_URL", "http://localhost:11434/v1").rstrip("/")
+    model = os.getenv("AI_MODEL", "qwen2.5:1.5b")
     if not api_key:
         return ("Le personnage et l'historique sont bien enregistrés. Pour activer les réponses IA, "
                 "configure un fournisseur IA dans les variables d'environnement Render.")
@@ -179,11 +180,11 @@ async def envoyer_message(message: MessageSchema):
     answer = await generer_reponse(character, history[:-1], message.content, memories)
     sauvegarder_message(character_id, "assistant", answer)
     # Après chaque réponse, mémoriser automatiquement les faits durables si l'IA est configurée.
-    api_key = os.getenv("OPENAI_API_KEY")
+    ai_enabled = bool(os.getenv("AI_MODEL") or os.getenv("OPENAI_API_KEY") or os.getenv("AI_API_KEY"))
     saved_memories = []
-    if api_key and character.get("enhanced_memory"):
+    if ai_enabled and character.get("enhanced_memory"):
         updated_history = recuperer_messages(character_id, 12)
-        saved_memories = await extraire_memoires(character, updated_history, api_key, os.getenv("OPENAI_MODEL", "gpt-4o-mini"))
+        saved_memories = await extraire_memoires(character, updated_history, os.getenv("AI_API_KEY") or os.getenv("OPENAI_API_KEY", ""), os.getenv("AI_MODEL", "qwen2.5:1.5b"))
     return {"speaker": message.speaker_name, "user_message": message.content, "response": answer,
             "memories_saved": len(saved_memories)}
 
@@ -200,5 +201,7 @@ def health():
         "status": "ok" if database_status == "connected" else "degraded",
         "database": "postgresql" if USE_POSTGRES else "sqlite",
         "database_status": database_status,
-        "ai_configured": bool(os.getenv("OPENAI_API_KEY"))
+        "ai_configured": bool(os.getenv("AI_MODEL") or os.getenv("OPENAI_API_KEY") or os.getenv("AI_API_KEY")),
+        "ai_provider": os.getenv("AI_BASE_URL", "http://localhost:11434/v1"),
+        "ai_model": os.getenv("AI_MODEL", "qwen2.5:1.5b")
     }
