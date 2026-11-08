@@ -1,7 +1,7 @@
 import os
 import secrets
 
-from fastapi import APIRouter, Header, HTTPException
+from fastapi import APIRouter, Depends, Header, HTTPException
 
 router = APIRouter(prefix="/core", tags=["NØX CORE"])
 
@@ -20,7 +20,7 @@ def verifier_cle_nox(x_nox_api_key: str = Header(default="")):
 
 
 @router.get("/status")
-def core_status(_authorized: bool = __import__("fastapi").Depends(verifier_cle_nox)):
+def core_status(_authorized: bool = Depends(verifier_cle_nox)):
     return {
         "name": "NØX CORE",
         "status": "online",
