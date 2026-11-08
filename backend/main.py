@@ -1,18 +1,17 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
 from api.routes import router
 
 app = FastAPI(
     title="NØX AI",
     description="API de ton assistant de roleplay",
-    version="0.1.0"
+    version="0.2.0"
 )
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"]
 )
@@ -25,13 +24,11 @@ def accueil():
     return {
         "nom": "NØX AI",
         "statut": "En ligne",
-        "message": "Bienvenue dans NØX AI !"
+        "message": "Bienvenue dans NØX AI !",
+        "version": "0.2.0"
     }
 
 
 @app.get("/status")
 def statut():
-    return {
-        "serveur": "actif",
-        "version": "0.1.0"
-    }
+    return {"serveur": "actif", "version": "0.2.0"}
