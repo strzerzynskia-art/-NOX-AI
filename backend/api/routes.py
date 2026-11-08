@@ -69,13 +69,64 @@ def ajouter_memoire(memory: MemorySchema):
     return {"message": "Mémoire enregistrée", "id": memory_id}
 
 
+async def extraire_memoires(character, history, api_key, model):
+    """Repère uniquement les faits durables réellement établis dans l'échange."""
+    if not character.get("enhanced_memory") or len(history) < 2:
+        return []
+    conversation = "\n".join(
+        ("Joueur" if item["role"] == "user" else character["name"]) + ": " + item["content"]
+        for item in history[-12:] if item["role"] in ("user", "assistant")
+    )
+    prompt = """Analyse cette conversation de roleplay. Retourne uniquement un tableau JSON.
+Garde seulement les faits utiles pour les prochaines conversations : relations établies,
+événements importants, promesses, préférences, informations personnelles révélées,
+évolution durable du personnage. N'invente rien. N'enregistre pas les éléments incertains,
+les détails banals, ni les actions/pensées supposées du joueur.
+Chaque élément doit être un objet avec "type" (relation, event, preference ou fact)
+et "content" (une phrase courte et précise). Maximum 5 éléments. Si rien d'important,
+retourne []."""
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            response = await client.post(
+                "https://api.openai.com/v1/chat/completions",
+                headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+                json={"model": model, "messages": [
+                    {"role": "system", "content": prompt},
+                    {"role": "user", "content": conversation}
+                ], "temperature": 0.1}
+            )
+            response.raise_for_status()
+            raw = response.json()["choices"][0]["message"]["content"].strip()
+        if raw.startswith("```"):
+            raw = raw.split("\n", 1)[-1].rsplit("```", 1)[0].strip()
+        import json
+        extracted = json.loads(raw)
+        if not isinstance(extracted, list):
+            return []
+        existing = {m["content"].casefold() for m in recuperer_memoires(character["id"], 100)}
+        saved = []
+        for item in extracted[:5]:
+            if not isinstance(item, dict):
+                continue
+            content = str(item.get("content", "")).strip()[:1000]
+            kind = str(item.get("type", "event")).strip().lower()
+            if content and content.casefold() not in existing and kind in ("relation", "event", "preference", "fact"):
+                sauvegarder_memoire(character["id"], content, kind)
+                existing.add(content.casefold())
+                saved.append(content)
+        return saved
+    except (httpx.HTTPError, ValueError, KeyError, IndexError, TypeError):
+        # Une extraction mémoire ratée ne doit jamais bloquer la discussion.
+        return []
+
+
 async def generer_reponse(character, history, user_text, memories):
     api_key = os.getenv("OPENAI_API_KEY")
     model = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
     if not api_key:
         return ("Le personnage et l'historique sont bien enregistrés. Pour activer les réponses IA, "
-                "ajoute OPENAI_API_KEY dans les variables d'environnement Render.")
-    memory_text = "\n".join(f"- {m['content']}" for m in memories)
+                "configure un fournisseur IA dans les variables d'environnement Render.")
+    memory_text = "\n".join(f"- [{m.get('memory_type', 'event')}] {m['content']}" for m in memories)
     system_prompt = f"""Tu es {character['name']}, un personnage fictif de roleplay.
 Âge : {character.get('age') or 'non précisé'}
 Apparence : {character.get('appearance', '')}
@@ -127,7 +178,14 @@ async def envoyer_message(message: MessageSchema):
     memories = recuperer_memoires(character_id, 30) if character.get("enhanced_memory") else []
     answer = await generer_reponse(character, history[:-1], message.content, memories)
     sauvegarder_message(character_id, "assistant", answer)
-    return {"speaker": message.speaker_name, "user_message": message.content, "response": answer}
+    # Après chaque réponse, mémoriser automatiquement les faits durables si l'IA est configurée.
+    api_key = os.getenv("OPENAI_API_KEY")
+    saved_memories = []
+    if api_key and character.get("enhanced_memory"):
+        updated_history = recuperer_messages(character_id, 12)
+        saved_memories = await extraire_memoires(character, updated_history, api_key, os.getenv("OPENAI_MODEL", "gpt-4o-mini"))
+    return {"speaker": message.speaker_name, "user_message": message.content, "response": answer,
+            "memories_saved": len(saved_memories)}
 
 
 @router.get("/health")
