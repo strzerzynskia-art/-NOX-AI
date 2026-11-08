@@ -36,7 +36,12 @@ def detail_personnage(character_id: int):
 def creer_personnage(personnage: CharacterSchema):
     try:
         character_id = sauvegarder_personnage(personnage)
-        return {"message": "Personnage créé", "id": character_id, "character": recuperer_personnage(character_id)}
+        character = recuperer_personnage(character_id)
+        # Enregistrer le premier message comme message du personnage :
+        # il apparaîtra dans l'historique et sera pris en compte par l'IA.
+        if character and character.get("first_message", "").strip():
+            sauvegarder_message(character_id, "assistant", character["first_message"].strip())
+        return {"message": "Personnage créé", "id": character_id, "character": character}
     except Exception as error:
         raise HTTPException(status_code=500, detail=f"Erreur de sauvegarde : {error}")
 
