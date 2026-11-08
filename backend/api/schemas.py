@@ -21,7 +21,8 @@ class CharacterSchema(BaseModel):
 
 
 class MessageSchema(BaseModel):
-    speaker_name: str = Field(min_length=1, max_length=80)
+    character_id: Optional[int] = None
+    speaker_name: Optional[str] = Field(default=None, min_length=1, max_length=80)
     content: str = Field(min_length=1, max_length=8000)
     message_type: str = "dialogue"
 
