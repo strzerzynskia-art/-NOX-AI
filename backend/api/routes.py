@@ -122,8 +122,8 @@ retourne []."""
 
 async def generer_reponse(character, history, user_text, memories):
     api_key = os.getenv("AI_API_KEY") or os.getenv("OPENAI_API_KEY", "")
-    base_url = os.getenv("AI_BASE_URL", "http://localhost:11434/v1").rstrip("/")
-    model = os.getenv("AI_MODEL", "qwen2.5:1.5b")
+    base_url = os.getenv("AI_BASE_URL", "https://api.openai.com/v1").rstrip("/")
+    model = os.getenv("AI_MODEL", "gpt-4o-mini")
     if not api_key:
         return ("Le personnage et l'historique sont bien enregistrés. Pour activer les réponses IA, "
                 "configure un fournisseur IA dans les variables d'environnement Render.")
@@ -149,7 +149,7 @@ Réponds en français, de façon naturelle et cohérente avec le personnage."""
     try:
         async with httpx.AsyncClient(timeout=45) as client:
             response = await client.post(
-                "https://api.openai.com/v1/chat/completions",
+                f"{base_url}/chat/completions",
                 headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
                 json={"model": model, "messages": messages, "temperature": 0.85}
             )
