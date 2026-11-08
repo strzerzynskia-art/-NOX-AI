@@ -6,7 +6,7 @@ from api.schemas import CharacterSchema, MessageSchema, MemorySchema
 from database.database import (
     initialiser_database, sauvegarder_personnage, recuperer_personnages,
     recuperer_personnage, sauvegarder_message, recuperer_messages,
-    sauvegarder_memoire, recuperer_memoires
+    sauvegarder_memoire, recuperer_memoires, get_connection, USE_POSTGRES
 )
 
 router = APIRouter(prefix="/api", tags=["NØX AI"])
@@ -190,4 +190,15 @@ async def envoyer_message(message: MessageSchema):
 
 @router.get("/health")
 def health():
-    return {"status": "ok", "ai_configured": bool(os.getenv("OPENAI_API_KEY"))}
+    try:
+        with get_connection() as connection:
+            connection.execute("SELECT 1").fetchone()
+        database_status = "connected"
+    except Exception:
+        database_status = "error"
+    return {
+        "status": "ok" if database_status == "connected" else "degraded",
+        "database": "postgresql" if USE_POSTGRES else "sqlite",
+        "database_status": database_status,
+        "ai_configured": bool(os.getenv("OPENAI_API_KEY"))
+    }
